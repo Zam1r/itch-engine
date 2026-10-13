@@ -1,0 +1,10 @@
+{
+  "speedup_vs_std_map": {
+    "throughput": 2.5269269033349295,
+    "p50": 1.6357615894039734,
+    "p99": 2.212422360248447,
+    "p999": 1.695688572624529
+  }
+}
+fast {'throughput_msgs_per_sec': 7242047, 'p50_ns': 151, 'p99_ns': 805, 'p999_ns': 2389, 'max_ns': 7786552, 'mean_ns': 207.34, 'heap_allocs_after_warmup': 84}
+map {'throughput_msgs_per_sec': 2865950, 'p50_ns': 247, 'p99_ns': 1781, 'p999_ns': 4051, 'max_ns': 207824618, 'mean_ns': 409.62, 'heap_allocs_after_warmup': 41240329}
