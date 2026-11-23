@@ -16,6 +16,7 @@ include_directories(include src)
 
 add_executable(itch_replay src/replay.cpp)
 add_executable(itch_verify src/verify.cpp)
+add_executable(itch_features src/features_main.cpp)
 
 include(FetchContent)
 FetchContent_Declare(Catch2 GIT_REPOSITORY https://github.com/catchorg/Catch2.git GIT_TAG v3.7.1 GIT_SHALLOW TRUE)

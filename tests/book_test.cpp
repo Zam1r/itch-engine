@@ -61,3 +61,19 @@ TEST_CASE("handler wires ITCH messages into the book") {
   CHECK(b->snapshot(3, Bid) == SideSnapshot{{5000, 60, 1}});
   CHECK(b->snapshot(3, Ask) == SideSnapshot{{5050, 30, 1}});
 }
+
+TEST_CASE("fast book level(k) matches snapshot (used by itch_features)") {
+  auto b = std::make_unique<FastBook>(1024, 12, 8);
+  b->add(1, 1, Bid, 100, 1000); b->add(1, 2, Bid, 50, 990); b->add(1, 3, Bid, 10, 980);
+  b->add(1, 4, Ask, 70, 1010); b->add(1, 5, Ask, 30, 1010);
+  for (Side s : {Bid, Ask}) {
+    auto snap = b->snapshot(1, s);
+    for (size_t k = 0; k < 6; ++k) {
+      uint32_t px = 0; uint64_t q = 0;
+      bool ok = b->level(1, s, k, px, q);
+      REQUIRE(ok == (k < snap.size()));
+      if (ok) { CHECK(px == snap[k].price); CHECK(q == snap[k].qty); }
+    }
+  }
+  uint32_t px; uint64_t q; REQUIRE(b->level(1, Ask, 0, px, q)); CHECK(px == 1010); CHECK(q == 100);
+}

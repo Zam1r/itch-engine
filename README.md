@@ -13,6 +13,9 @@ A zero-copy decoder for every ITCH 5.0 message type, plus a full-depth (order-by
 
 These are in-process numbers replayed from memory, not wire-to-wire or tick-to-trade.
 
+## Research: order-book imbalance study
+Full-day replay (368M messages, 30 Jan 2019) of the 50 most active symbols through `FastBook`. A logistic model on level-1 queue imbalance, fitted on the morning only, predicts the direction of the next mid-price move with **63.5% out-of-sample accuracy** on the afternoon (AUC 0.690, 15.3M test events). That compares with 53.3% for a last-move rule and 50.4% for the majority class. Method, confidence intervals and caveats are in [bench/IMBALANCE_STUDY.md](bench/IMBALANCE_STUDY.md).
+
 ## Architecture
 ```mermaid
 flowchart LR
@@ -38,6 +41,8 @@ include/book/map_book.hpp   std::map + std::list + unordered_map baseline
 include/book/book_handler.hpp  ITCH → book operations (A/F/E/C/X/D/U)
 src/replay.cpp              itch_replay: stats / throughput / latency (rdtsc histogram)
 src/verify.cpp              itch_verify: fast vs baseline full-depth comparison
+src/features_main.cpp       itch_features: top-of-book event stream for the imbalance study
+scripts/imbalance_study.py  imbalance / OFI analysis (run_imbalance_study.sh reproduces it)
 tests/                      Catch2 unit + randomised equivalence tests
 bench/                      run_all.sh, summarize.py, results.json, RESULTS.md, raw results
 scripts/get_data.sh         downloads a slice of a real NASDAQ sample day
@@ -66,6 +71,6 @@ RUNS=5 CPU=2 bench/run_all.sh data/01302019.itch
 ## Not implemented (yet)
 - Network path: MoldUDP64/UDP replay, PCAP generation, AF_XDP or DPDK receive. None of these exist in this repo, so nothing here claims kernel bypass.
 - Matching engine, TCP exchange simulator and toy strategy (end-to-end tick-to-trade).
-- Full-day replay (only the first 33M messages are benchmarked), perf/flame-graph profiling, and CI workflow.
+- Full-day latency benchmark (only the first 33M messages are benchmarked; the imbalance study replays the full day), perf/flame-graph profiling, and CI workflow.
 
 Data: NASDAQ TotalView-ITCH 5.0 sample files, https://emi.nasdaq.com/ITCH/Nasdaq%20ITCH/. Data files are not committed.

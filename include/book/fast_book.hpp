@@ -87,6 +87,11 @@ class FastBook {
     px = lv.back().price; qty = lv.back().qty; return true;
   }
   uint64_t pool_grows() const { return pool_grows_; }
+  // k-th best level (k = 0 is the top of book) without allocating.
+  bool level(uint16_t loc, Side s, size_t k, uint32_t& px, uint64_t& qty) const {
+    const auto& lv = syms_[loc].s[s].lv; if (k >= lv.size()) return false;
+    px = lv[lv.size() - 1 - k].price; qty = lv[lv.size() - 1 - k].qty; return true;
+  }
 
  private:
   // "better" = closer to top of book
